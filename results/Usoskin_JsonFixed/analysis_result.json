@@ -1,0 +1,14 @@
+{
+  "dataset_name": "Usoskin_JsonFixed",
+  "data_shape": [
+    622,
+    17772
+  ],
+  "final_performance": {
+    "nmi": 0.2101376069160795,
+    "ari": 0.1949544823910879
+  },
+  "total_improvement": 0.0,
+  "iterations_used": 3,
+  "processing_time": 216.713636636734
+}
