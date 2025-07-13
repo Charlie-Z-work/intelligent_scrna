@@ -113,7 +113,17 @@ class IntelligentScRNAAtlas:
         learning_result = self.iterative_learner.optimize(
             X, y_true, initial_strategy, max_iterations
         )
-        
+
+        # 增加安全检查
+        if learning_result is None:
+            print("⚠️ 学习结果为空，创建备用结果")
+            learning_result = {
+                'trajectory': [],
+                'final_performance': {'nmi': 0.0, 'ari': 0.0, 'silhouette': 0.0},
+                'total_improvement': 0,
+                'iterations_used': 0
+            }
+
         # 5. 结果整理
         final_result = {
             'dataset_name': dataset_name,
