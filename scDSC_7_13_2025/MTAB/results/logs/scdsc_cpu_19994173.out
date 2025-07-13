@@ -1,0 +1,68 @@
+🚀 CPU版本训练: Sun Jul 13 01:14:59 AM CDT 2025
+/users/tzheng/scDSC/scDSC_7_13_2025/utils.py:66: UserWarning: torch.sparse.SparseTensor(indices, values, shape, *, device=) is deprecated.  Please use torch.sparse_coo_tensor(indices, values, shape, dtype=, device=). (Triggered internally at /pytorch/torch/csrc/utils/tensor_new.cpp:644.)
+  return torch.sparse.FloatTensor(indices, values, shape)
+🚀 scDSC 训练启动
+📊 配置: 8聚类, 5000基因, 200轮训练
+✅ 所有必要文件已就绪
+📖 加载数据...
+   数据维度: (1193, 5000)
+   标签数量: 8
+   原始数据: (1193, 5000)
+   Size factors范围: [-69.760, 7.937]
+✅ 数据一致性检查通过
+
+============================================================
+🎯 开始 scDSC 训练
+============================================================
+🖥️  使用设备: cpu
+🧬 ZINB模块: 禁用 (CPU模式)
+✅ 加载预训练模型: model/mtab.pkl
+📋 模型参数总数: 11,396,368
+📊 图尺寸: torch.Size([1193, 1193])
+📊 数据尺寸: torch.Size([1193, 5000])
+🏷️  标签数量: 8
+🎯 初始化聚类中心...
+📈 初始聚类结果:
+0 :acc 0.3881 , nmi 0.2838 , ari 0.1301 , f1 0.2837
+📊 损失权重: α=0.1, β=0.01, γ=1.0, δ=0.0 (ZINB禁用)
+
+🚀 开始训练 (最多200轮)...
+
+📍 Epoch 0: 更新目标分布
+   Q分布: ARI=0.1301, NMI=0.2838
+   Z分布: ARI=0.1637, NMI=0.3286
+   🎯 新最佳: ARI=0.1637
+Epoch   0: total=0.2461, kl=0.1711, ce=2.4413, re=0.2046, zinb=0.0000 (0.3s)
+
+📍 Epoch 10: 更新目标分布
+   Q分布: ARI=0.1317, NMI=0.2862
+   Z分布: ARI=0.1160, NMI=0.2212
+Epoch  10: total=0.2179, kl=0.1723, ce=0.8198, re=0.1925, zinb=0.0000 (0.2s)
+
+📍 Epoch 20: 更新目标分布
+   Q分布: ARI=0.1285, NMI=0.2911
+   Z分布: ARI=0.1102, NMI=0.2752
+Epoch  20: total=0.2122, kl=0.1722, ce=0.4134, re=0.1909, zinb=0.0000 (0.2s)
+
+📍 Epoch 30: 更新目标分布
+   Q分布: ARI=0.1266, NMI=0.2952
+   Z分布: ARI=0.1467, NMI=0.3260
+🛑 早停 (patience=3)!
+
+⏱️  训练完成，总耗时: 5.8秒
+
+🎯 计算最终结果...
+
+📊 最终结果总结:
+==================================================
+Q分布 (聚类层): ARI=0.1266, NMI=0.2952
+Z分布 (GNN层):  ARI=0.1467, NMI=0.3260
+训练最佳:       ARI=0.1637 (epoch 0)
+设备:          cpu
+ZINB:          禁用
+==================================================
+
+📈 与论文结果对比 (使用Z分布):
+ARI: 0.1467 / 0.62 = 23.7%
+NMI: 0.3260 / 0.68 = 47.9%
+✅ 完成: Sun Jul 13 01:15:22 AM CDT 2025

@@ -1,0 +1,7 @@
+  WARNING: The script natsort is installed in '/users/tzheng/.local/bin' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+  WARNING: The script scanpy is installed in '/users/tzheng/.local/bin' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+
+[notice] A new release of pip is available: 24.0 -> 25.1.1
+[notice] To update, run: pip install --upgrade pip

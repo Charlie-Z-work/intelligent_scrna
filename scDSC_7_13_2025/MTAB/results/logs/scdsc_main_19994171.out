@@ -1,0 +1,96 @@
+🚀 直接运行主训练: Sun Jul 13 01:12:57 AM CDT 2025
+Sun Jul 13 01:12:57 2025       
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 525.147.05   Driver Version: 525.147.05   CUDA Version: 12.0     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  Tesla V100-SXM2...  On   | 00000000:15:00.0 Off |                    0 |
+| N/A   26C    P0    42W / 300W |      0MiB / 32768MiB |      0%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+                                                                               
++-----------------------------------------------------------------------------+
+| Processes:                                                                  |
+|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+|        ID   ID                                                   Usage      |
+|=============================================================================|
+|  No running processes found                                                 |
++-----------------------------------------------------------------------------+
+📦 安装必要包...
+Requirement already satisfied: h5py in /users/tzheng/.local/lib/python3.11/site-packages (3.14.0)
+Requirement already satisfied: munkres in /users/tzheng/.local/lib/python3.11/site-packages (1.1.4)
+Requirement already satisfied: numpy>=1.19.3 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from h5py) (1.26.4)
+
+[notice] A new release of pip is available: 24.0 -> 25.1.1
+[notice] To update, run: pip install --upgrade pip
+🔧 直接运行主训练...
+/users/tzheng/scDSC/scDSC_7_13_2025/utils.py:66: UserWarning: torch.sparse.SparseTensor(indices, values, shape, *, device=) is deprecated.  Please use torch.sparse_coo_tensor(indices, values, shape, dtype=, device=). (Triggered internally at /pytorch/torch/csrc/utils/tensor_new.cpp:644.)
+  return torch.sparse.FloatTensor(indices, values, shape)
+🚀 scDSC 训练启动
+📊 配置: 8聚类, 5000基因, 200轮训练
+✅ 所有必要文件已就绪
+📖 加载数据...
+   数据维度: (1193, 5000)
+   标签数量: 8
+   原始数据: (1193, 5000)
+   Size factors范围: [-69.760, 7.937]
+✅ 数据一致性检查通过
+
+============================================================
+🎯 开始 scDSC 训练
+============================================================
+🖥️  使用设备: cuda
+🧬 ZINB模块: 启用
+✅ 加载预训练模型: model/mtab.pkl
+📋 模型参数总数: 18,911,368
+📊 图尺寸: torch.Size([1193, 1193])
+📊 数据尺寸: torch.Size([1193, 5000])
+🏷️  标签数量: 8
+🎯 初始化聚类中心...
+📈 初始聚类结果:
+0 :acc 0.3881 , nmi 0.2838 , ari 0.1301 , f1 0.2837
+📊 损失权重: α=0.1, β=0.01, γ=1.0, δ=0.1
+
+🚀 开始训练 (最多200轮)...
+
+📍 Epoch 0: 更新目标分布
+   Q分布: ARI=0.1301, NMI=0.2838
+   Z分布: ARI=0.1052, NMI=0.2176
+   🎯 新最佳: ARI=0.1052
+Epoch   0: total=nan, kl=0.1711, ce=2.6506, re=0.2046, zinb=nan (1.4s)
+
+📍 Epoch 10: 更新目标分布
+   Q分布: ARI=0.0000, NMI=0.0000
+   Z分布: ARI=0.0000, NMI=0.0000
+Epoch  10: total=nan, kl=nan, ce=nan, re=nan, zinb=nan (0.0s)
+
+📍 Epoch 20: 更新目标分布
+   Q分布: ARI=0.0000, NMI=0.0000
+   Z分布: ARI=0.0000, NMI=0.0000
+Epoch  20: total=nan, kl=nan, ce=nan, re=nan, zinb=nan (0.0s)
+
+📍 Epoch 30: 更新目标分布
+   Q分布: ARI=0.0000, NMI=0.0000
+   Z分布: ARI=0.0000, NMI=0.0000
+🛑 早停 (patience=3)!
+
+⏱️  训练完成，总耗时: 2.6秒
+
+🎯 计算最终结果...
+
+📊 最终结果总结:
+==================================================
+Q分布 (聚类层): ARI=0.0000, NMI=0.0000
+Z分布 (GNN层):  ARI=0.0000, NMI=0.0000
+训练最佳:       ARI=0.1052 (epoch 0)
+设备:          cuda
+ZINB:          启用
+==================================================
+
+📈 与论文结果对比 (使用Z分布):
+ARI: 0.0000 / 0.62 = 0.0%
+NMI: 0.0000 / 0.68 = 0.0%
+✅ 完成: Sun Jul 13 01:13:18 AM CDT 2025

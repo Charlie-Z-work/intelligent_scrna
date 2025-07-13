@@ -1,0 +1,111 @@
+🚀 GPU流水线开始: Sun Jul 13 01:25:25 AM CDT 2025
+Sun Jul 13 01:25:25 2025       
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 525.147.05   Driver Version: 525.147.05   CUDA Version: 12.0     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  Tesla V100-SXM2...  On   | 00000000:15:00.0 Off |                    0 |
+| N/A   26C    P0    42W / 300W |      0MiB / 32768MiB |      0%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+                                                                               
++-----------------------------------------------------------------------------+
+| Processes:                                                                  |
+|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+|        ID   ID                                                   Usage      |
+|=============================================================================|
+|  No running processes found                                                 |
++-----------------------------------------------------------------------------+
+📦 安装依赖...
+Requirement already satisfied: scanpy in /users/tzheng/.local/lib/python3.11/site-packages (1.11.3)
+Requirement already satisfied: h5py in /users/tzheng/.local/lib/python3.11/site-packages (3.14.0)
+Requirement already satisfied: munkres in /users/tzheng/.local/lib/python3.11/site-packages (1.1.4)
+Requirement already satisfied: scikit-learn in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (1.6.1)
+Requirement already satisfied: anndata>=0.8 in /users/tzheng/.local/lib/python3.11/site-packages (from scanpy) (0.11.4)
+Requirement already satisfied: joblib in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from scanpy) (1.4.2)
+Requirement already satisfied: legacy-api-wrap>=1.4.1 in /users/tzheng/.local/lib/python3.11/site-packages (from scanpy) (1.4.1)
+Requirement already satisfied: matplotlib>=3.7.5 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from scanpy) (3.10.1)
+Requirement already satisfied: natsort in /users/tzheng/.local/lib/python3.11/site-packages (from scanpy) (8.4.0)
+Requirement already satisfied: networkx>=2.7.1 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from scanpy) (3.4.2)
+Requirement already satisfied: numba>=0.57.1 in /users/tzheng/.local/lib/python3.11/site-packages (from scanpy) (0.61.2)
+Requirement already satisfied: numpy>=1.24.1 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from scanpy) (1.26.4)
+Requirement already satisfied: packaging>=21.3 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from scanpy) (24.2)
+Requirement already satisfied: pandas>=1.5.3 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from scanpy) (2.2.3)
+Requirement already satisfied: patsy!=1.0.0 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from scanpy) (1.0.1)
+Requirement already satisfied: pynndescent>=0.5.13 in /users/tzheng/.local/lib/python3.11/site-packages (from scanpy) (0.5.13)
+Requirement already satisfied: scipy<1.16.0,>=1.8.1 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from scanpy) (1.15.2)
+Requirement already satisfied: seaborn>=0.13.2 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from scanpy) (0.13.2)
+Requirement already satisfied: session-info2 in /users/tzheng/.local/lib/python3.11/site-packages (from scanpy) (0.1.2)
+Requirement already satisfied: statsmodels>=0.14.4 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from scanpy) (0.14.4)
+Requirement already satisfied: tqdm in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from scanpy) (4.67.1)
+Requirement already satisfied: typing-extensions in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from scanpy) (4.13.0)
+Requirement already satisfied: umap-learn>=0.5.6 in /users/tzheng/.local/lib/python3.11/site-packages (from scanpy) (0.5.9.post2)
+Requirement already satisfied: threadpoolctl>=3.1.0 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from scikit-learn) (3.6.0)
+Requirement already satisfied: array-api-compat!=1.5,>1.4 in /users/tzheng/.local/lib/python3.11/site-packages (from anndata>=0.8->scanpy) (1.12.0)
+Requirement already satisfied: contourpy>=1.0.1 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from matplotlib>=3.7.5->scanpy) (1.3.1)
+Requirement already satisfied: cycler>=0.10 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from matplotlib>=3.7.5->scanpy) (0.12.1)
+Requirement already satisfied: fonttools>=4.22.0 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from matplotlib>=3.7.5->scanpy) (4.56.0)
+Requirement already satisfied: kiwisolver>=1.3.1 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from matplotlib>=3.7.5->scanpy) (1.4.8)
+Requirement already satisfied: pillow>=8 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from matplotlib>=3.7.5->scanpy) (11.2.0)
+Requirement already satisfied: pyparsing>=2.3.1 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from matplotlib>=3.7.5->scanpy) (3.2.3)
+Requirement already satisfied: python-dateutil>=2.7 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from matplotlib>=3.7.5->scanpy) (2.9.0.post0)
+Requirement already satisfied: llvmlite<0.45,>=0.44.0dev0 in /users/tzheng/.local/lib/python3.11/site-packages (from numba>=0.57.1->scanpy) (0.44.0)
+Requirement already satisfied: pytz>=2020.1 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from pandas>=1.5.3->scanpy) (2025.2)
+Requirement already satisfied: tzdata>=2022.7 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from pandas>=1.5.3->scanpy) (2025.2)
+Requirement already satisfied: six>=1.5 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from python-dateutil>=2.7->matplotlib>=3.7.5->scanpy) (1.17.0)
+🔧 运行完整流水线...
+🚀 scDSC 论文复现流水线启动
+📍 工作目录: /users/tzheng/scDSC/scDSC_7_13_2025/MTAB
+🐍 Python版本: 3.11.11 | packaged by conda-forge | (main, Mar  3 2025, 20:43:55) [GCC 13.3.0]
+
+============================================================
+🕐 [01:25:29] 依赖检查
+============================================================
+✅ numpy
+✅ pandas
+✅ torch
+✅ sklearn
+✅ scanpy
+✅ matplotlib
+✅ seaborn
+✅ h5py
+
+============================================================
+🕐 [01:25:33] 数据文件检查
+============================================================
+✅ data/mtab.txt (96757340 bytes)
+✅ data/mtab_label.txt (2386 bytes)
+📁 data/ 目录已确保存在
+📁 graph/ 目录已确保存在
+📁 model/ 目录已确保存在
+📁 results/ 目录已确保存在
+
+🎯 步骤 1/5: 数据预处理
+
+============================================================
+🕐 [01:25:33] 开始 数据预处理
+============================================================
+❌ 数据预处理 失败!
+错误代码: 1
+错误输出:
+Traceback (most recent call last):
+  File "/users/tzheng/scDSC/scDSC_7_13_2025/MTAB/preprocess_mtab.py", line 12, in <module>
+    sc.settings.set_figure_params(dpi=80, facecolor='white')
+  File "/users/tzheng/.local/lib/python3.11/site-packages/scanpy/_settings/__init__.py", line 338, in set_figure_params
+    cls.set_figure_params(*args, **kwargs)
+  File "/users/tzheng/.local/lib/python3.11/site-packages/scanpy/_settings/__init__.py", line 338, in set_figure_params
+    cls.set_figure_params(*args, **kwargs)
+  File "/users/tzheng/.local/lib/python3.11/site-packages/scanpy/_settings/__init__.py", line 338, in set_figure_params
+    cls.set_figure_params(*args, **kwargs)
+  [Previous line repeated 996 more times]
+RecursionError: maximum recursion depth exceeded in comparison
+
+
+💥 流水线在步骤 1 失败: 数据预处理
+🛑 终止执行
+
+💥 流水线执行失败!
+✅ 完成: Sun Jul 13 01:25:38 AM CDT 2025

@@ -1,0 +1,738 @@
+🚀 GPU流水线开始: Sun Jul 13 01:36:54 AM CDT 2025
+Sun Jul 13 01:36:54 2025       
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 525.147.05   Driver Version: 525.147.05   CUDA Version: 12.0     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  Tesla V100-SXM2...  On   | 00000000:16:00.0 Off |                    0 |
+| N/A   29C    P0    42W / 300W |      0MiB / 32768MiB |      0%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+                                                                               
++-----------------------------------------------------------------------------+
+| Processes:                                                                  |
+|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+|        ID   ID                                                   Usage      |
+|=============================================================================|
+|  No running processes found                                                 |
++-----------------------------------------------------------------------------+
+📦 安装依赖...
+Requirement already satisfied: scanpy in /users/tzheng/.local/lib/python3.11/site-packages (1.11.3)
+Requirement already satisfied: h5py in /users/tzheng/.local/lib/python3.11/site-packages (3.14.0)
+Requirement already satisfied: munkres in /users/tzheng/.local/lib/python3.11/site-packages (1.1.4)
+Requirement already satisfied: scikit-learn in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (1.6.1)
+Requirement already satisfied: anndata>=0.8 in /users/tzheng/.local/lib/python3.11/site-packages (from scanpy) (0.11.4)
+Requirement already satisfied: joblib in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from scanpy) (1.4.2)
+Requirement already satisfied: legacy-api-wrap>=1.4.1 in /users/tzheng/.local/lib/python3.11/site-packages (from scanpy) (1.4.1)
+Requirement already satisfied: matplotlib>=3.7.5 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from scanpy) (3.10.1)
+Requirement already satisfied: natsort in /users/tzheng/.local/lib/python3.11/site-packages (from scanpy) (8.4.0)
+Requirement already satisfied: networkx>=2.7.1 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from scanpy) (3.4.2)
+Requirement already satisfied: numba>=0.57.1 in /users/tzheng/.local/lib/python3.11/site-packages (from scanpy) (0.61.2)
+Requirement already satisfied: numpy>=1.24.1 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from scanpy) (1.26.4)
+Requirement already satisfied: packaging>=21.3 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from scanpy) (24.2)
+Requirement already satisfied: pandas>=1.5.3 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from scanpy) (2.2.3)
+Requirement already satisfied: patsy!=1.0.0 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from scanpy) (1.0.1)
+Requirement already satisfied: pynndescent>=0.5.13 in /users/tzheng/.local/lib/python3.11/site-packages (from scanpy) (0.5.13)
+Requirement already satisfied: scipy<1.16.0,>=1.8.1 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from scanpy) (1.15.2)
+Requirement already satisfied: seaborn>=0.13.2 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from scanpy) (0.13.2)
+Requirement already satisfied: session-info2 in /users/tzheng/.local/lib/python3.11/site-packages (from scanpy) (0.1.2)
+Requirement already satisfied: statsmodels>=0.14.4 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from scanpy) (0.14.4)
+Requirement already satisfied: tqdm in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from scanpy) (4.67.1)
+Requirement already satisfied: typing-extensions in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from scanpy) (4.13.0)
+Requirement already satisfied: umap-learn>=0.5.6 in /users/tzheng/.local/lib/python3.11/site-packages (from scanpy) (0.5.9.post2)
+Requirement already satisfied: threadpoolctl>=3.1.0 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from scikit-learn) (3.6.0)
+Requirement already satisfied: array-api-compat!=1.5,>1.4 in /users/tzheng/.local/lib/python3.11/site-packages (from anndata>=0.8->scanpy) (1.12.0)
+Requirement already satisfied: contourpy>=1.0.1 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from matplotlib>=3.7.5->scanpy) (1.3.1)
+Requirement already satisfied: cycler>=0.10 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from matplotlib>=3.7.5->scanpy) (0.12.1)
+Requirement already satisfied: fonttools>=4.22.0 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from matplotlib>=3.7.5->scanpy) (4.56.0)
+Requirement already satisfied: kiwisolver>=1.3.1 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from matplotlib>=3.7.5->scanpy) (1.4.8)
+Requirement already satisfied: pillow>=8 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from matplotlib>=3.7.5->scanpy) (11.2.0)
+Requirement already satisfied: pyparsing>=2.3.1 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from matplotlib>=3.7.5->scanpy) (3.2.3)
+Requirement already satisfied: python-dateutil>=2.7 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from matplotlib>=3.7.5->scanpy) (2.9.0.post0)
+Requirement already satisfied: llvmlite<0.45,>=0.44.0dev0 in /users/tzheng/.local/lib/python3.11/site-packages (from numba>=0.57.1->scanpy) (0.44.0)
+Requirement already satisfied: pytz>=2020.1 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from pandas>=1.5.3->scanpy) (2025.2)
+Requirement already satisfied: tzdata>=2022.7 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from pandas>=1.5.3->scanpy) (2025.2)
+Requirement already satisfied: six>=1.5 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from python-dateutil>=2.7->matplotlib>=3.7.5->scanpy) (1.17.0)
+🔧 运行完整流水线...
+🚀 scDSC 论文复现流水线启动
+📍 工作目录: /users/tzheng/scDSC/scDSC_7_13_2025/MTAB
+🐍 Python版本: 3.11.11 | packaged by conda-forge | (main, Mar  3 2025, 20:43:55) [GCC 13.3.0]
+
+============================================================
+🕐 [01:36:58] 依赖检查
+============================================================
+✅ numpy
+✅ pandas
+✅ torch
+✅ sklearn
+✅ scanpy
+✅ matplotlib
+✅ seaborn
+✅ h5py
+
+============================================================
+🕐 [01:37:02] 数据文件检查
+============================================================
+✅ data/mtab.txt (96757340 bytes)
+✅ data/mtab_label.txt (2386 bytes)
+📁 data/ 目录已确保存在
+📁 graph/ 目录已确保存在
+📁 model/ 目录已确保存在
+📁 results/ 目录已确保存在
+
+🎯 步骤 1/5: 数据预处理
+
+============================================================
+🕐 [01:37:02] 开始 数据预处理
+============================================================
+📤 输出:
+🔄 开始MTAB-3929数据预处理...
+📖 读取原始数据...
+原始数据维度: (1193, 33501)
+标签数量: 1193
+创建AnnData对象: AnnData object with n_obs × n_vars = 1193 × 33501
+    obs: 'cell_type'
+📊 计算质控指标...
+质控指标统计:
+细胞总UMI数: count    1.193000e+03
+mean     3.589815e+06
+std      2.791468e+06
+min      1.941800e+04
+25%      1.705550e+06
+50%      3.173759e+06
+75%      4.849742e+06
+max      3.511870e+07
+Name: total_counts, dtype: float64
+细胞基因数: count     1193.000000
+mean     10676.744342
+std       1894.899149
+min       5489.000000
+25%       9437.000000
+50%      10784.000000
+75%      11969.000000
+max      16213.000000
+Name: n_genes, dtype: float64
+基因表达细胞数: count    33501.000000
+mean       380.208233
+std        447.963203
+min          0.000000
+25%         13.000000
+50%        117.000000
+75%        818.000000
+max       1193.000000
+Name: n_cells, dtype: float64
+🔍 过滤低质量数据...
+过滤前细胞数: 1193
+过滤后细胞数: 1193
+过滤前基因数: 33501
+过滤后基因数: 29692
+🎯 选择高变异基因...
+高变异基因数: 7075
+📏 标准化数据...
+基因数(7075)仍然较多，进一步选择top 5000基因...
+最终数据维度: (1193, 5000)
+💾 保存预处理数据...
+✅ 预处理完成！
+原始维度: (1193, 33501)
+处理后维度: (1193, 5000)
+聚类数: 8
+
+📋 预处理摘要:
+- 数据维度: (1193, 5000)
+- 细胞类型: [0 1 2 3 4 5 6 7]
+- 输出文件: mtab_processed.txt, mtab_label_processed.txt
+
+✅ data/mtab_processed.txt (153009821 bytes)
+✅ data/mtab_processed_label.txt (2386 bytes)
+⏱️  数据预处理 完成 (23.1秒)
+✅ 步骤 1 完成: 数据预处理
+
+🎯 步骤 2/5: KNN图构建
+
+============================================================
+🕐 [01:37:25] 开始 KNN图构建
+============================================================
+📤 输出:
+📖 读取预处理数据...
+数据维度: (1193, 5000)
+标签数: 8
+标签分布: [ 64  16  79  45  29 161 106 693]
+
+🔍 测试不同相似度方法的错误率:
+
+--- Pearson 方法 ---
+距离矩阵统计: min=-0.3859, max=1.0000, mean=0.0037
+KNN图构建完成:
+  - 总边数: 11930
+  - 错误边数: 1333
+  - 错误率: 0.1117
+  - 文件保存至: graph/mtab_processed_graph.txt
+
+--- Cosine 方法 ---
+距离矩阵统计: min=-0.3815, max=1.0000, mean=0.0039
+KNN图构建完成:
+  - 总边数: 11930
+  - 错误边数: 1305
+  - 错误率: 0.1094
+  - 文件保存至: graph/mtab_processed_graph.txt
+
+--- Normalized Cosine 方法 ---
+距离矩阵统计: min=-0.3815, max=1.0000, mean=0.0039
+KNN图构建完成:
+  - 总边数: 11930
+  - 错误边数: 1305
+  - 错误率: 0.1094
+  - 文件保存至: graph/mtab_processed_graph.txt
+
+--- Heat Kernel 方法 ---
+距离矩阵统计: min=0.9982, max=1.0000, mean=0.9996
+KNN图构建完成:
+  - 总边数: 11930
+  - 错误边数: 2129
+  - 错误率: 0.1785
+  - 文件保存至: graph/mtab_processed_graph.txt
+
+✅ 推荐使用 Pearson 方法构建的图文件
+
+✅ graph/mtab_processed_graph.txt (96596 bytes)
+⏱️  KNN图构建 完成 (3.8秒)
+✅ 步骤 2 完成: KNN图构建
+
+🎯 步骤 3/5: H5文件创建
+
+============================================================
+🕐 [01:37:29] 开始 H5文件创建
+============================================================
+📤 输出:
+X shape: (1193, 5000)
+y shape: (1193,)
+✅ 已创建 mtab.h5 文件
+
+✅ data/mtab.h5 (47731592 bytes)
+⏱️  H5文件创建 完成 (2.0秒)
+✅ 步骤 3 完成: H5文件创建
+
+🎯 步骤 4/5: 自编码器预训练
+
+============================================================
+🕐 [01:37:31] 开始 自编码器预训练
+============================================================
+📤 输出:
+数据维度: (1193, 5000)
+标签数量: 8
+AE(
+  (enc_1): Linear(in_features=5000, out_features=500, bias=True)
+  (BN1): BatchNorm1d(500, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (enc_2): Linear(in_features=500, out_features=500, bias=True)
+  (BN2): BatchNorm1d(500, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (enc_3): Linear(in_features=500, out_features=2000, bias=True)
+  (BN3): BatchNorm1d(2000, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (z_layer): Linear(in_features=2000, out_features=20, bias=True)
+  (dec_1): Linear(in_features=20, out_features=2000, bias=True)
+  (BN4): BatchNorm1d(2000, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (dec_2): Linear(in_features=2000, out_features=500, bias=True)
+  (BN5): BatchNorm1d(500, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (dec_3): Linear(in_features=500, out_features=500, bias=True)
+  (BN6): BatchNorm1d(500, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (x_bar_layer): Linear(in_features=500, out_features=5000, bias=True)
+)
+epoch 0 loss: 1.0057
+0 :acc 0.8097 , nmi 0.6579 , ari 0.7390 , f1 0.4568
+epoch 1 loss: 0.9254
+1 :acc 0.8248 , nmi 0.7116 , ari 0.7752 , f1 0.4658
+epoch 2 loss: 0.8691
+2 :acc 0.6236 , nmi 0.6275 , ari 0.4876 , f1 0.4625
+epoch 3 loss: 0.8309
+3 :acc 0.5993 , nmi 0.6273 , ari 0.4791 , f1 0.4538
+epoch 4 loss: 0.8037
+4 :acc 0.6094 , nmi 0.6224 , ari 0.4756 , f1 0.4590
+epoch 5 loss: 0.7839
+5 :acc 0.6572 , nmi 0.6210 , ari 0.5084 , f1 0.4665
+epoch 6 loss: 0.7686
+6 :acc 0.6689 , nmi 0.6257 , ari 0.5217 , f1 0.4700
+epoch 7 loss: 0.7572
+7 :acc 0.6773 , nmi 0.6224 , ari 0.5302 , f1 0.4711
+epoch 8 loss: 0.7469
+8 :acc 0.6052 , nmi 0.6091 , ari 0.4098 , f1 0.5050
+epoch 9 loss: 0.7382
+9 :acc 0.5809 , nmi 0.6478 , ari 0.4893 , f1 0.4548
+epoch 10 loss: 0.7301
+10 :acc 0.5876 , nmi 0.6396 , ari 0.4825 , f1 0.4499
+epoch 11 loss: 0.7234
+11 :acc 0.6706 , nmi 0.6391 , ari 0.5308 , f1 0.4595
+epoch 12 loss: 0.7175
+12 :acc 0.6396 , nmi 0.6092 , ari 0.4358 , f1 0.5044
+epoch 13 loss: 0.7135
+13 :acc 0.5951 , nmi 0.6382 , ari 0.4811 , f1 0.4653
+epoch 14 loss: 0.7110
+14 :acc 0.5750 , nmi 0.6427 , ari 0.4826 , f1 0.4572
+epoch 15 loss: 0.7067
+15 :acc 0.7217 , nmi 0.6458 , ari 0.5841 , f1 0.4862
+epoch 16 loss: 0.7059
+16 :acc 0.5650 , nmi 0.6119 , ari 0.3976 , f1 0.4976
+epoch 17 loss: 0.7031
+17 :acc 0.5599 , nmi 0.6185 , ari 0.4066 , f1 0.5057
+epoch 18 loss: 0.6988
+18 :acc 0.5725 , nmi 0.6187 , ari 0.4083 , f1 0.5009
+epoch 19 loss: 0.6948
+19 :acc 0.5683 , nmi 0.6083 , ari 0.3947 , f1 0.4944
+epoch 20 loss: 0.6934
+20 :acc 0.5599 , nmi 0.6075 , ari 0.3869 , f1 0.4964
+epoch 21 loss: 0.6915
+21 :acc 0.7192 , nmi 0.6519 , ari 0.5870 , f1 0.4902
+epoch 22 loss: 0.6871
+22 :acc 0.5708 , nmi 0.6089 , ari 0.3974 , f1 0.5120
+epoch 23 loss: 0.6845
+23 :acc 0.5759 , nmi 0.6058 , ari 0.4053 , f1 0.5128
+epoch 24 loss: 0.6813
+24 :acc 0.5591 , nmi 0.6014 , ari 0.3878 , f1 0.4974
+epoch 25 loss: 0.6784
+25 :acc 0.5591 , nmi 0.6058 , ari 0.3878 , f1 0.4971
+epoch 26 loss: 0.6762
+26 :acc 0.5792 , nmi 0.6190 , ari 0.4151 , f1 0.5221
+epoch 27 loss: 0.6722
+27 :acc 0.5801 , nmi 0.6162 , ari 0.4163 , f1 0.5200
+epoch 28 loss: 0.6696
+28 :acc 0.5784 , nmi 0.6153 , ari 0.4143 , f1 0.5191
+epoch 29 loss: 0.6676
+29 :acc 0.5733 , nmi 0.6117 , ari 0.3988 , f1 0.5151
+epoch 30 loss: 0.6659
+30 :acc 0.5909 , nmi 0.6155 , ari 0.4052 , f1 0.5080
+epoch 31 loss: 0.6641
+31 :acc 0.6362 , nmi 0.5965 , ari 0.4687 , f1 0.4891
+epoch 32 loss: 0.6607
+32 :acc 0.5692 , nmi 0.6100 , ari 0.3996 , f1 0.5094
+epoch 33 loss: 0.6583
+33 :acc 0.5633 , nmi 0.6039 , ari 0.3894 , f1 0.5008
+epoch 34 loss: 0.6565
+34 :acc 0.5918 , nmi 0.6113 , ari 0.4062 , f1 0.5086
+epoch 35 loss: 0.6533
+35 :acc 0.5893 , nmi 0.6082 , ari 0.4021 , f1 0.5049
+epoch 36 loss: 0.6508
+36 :acc 0.5868 , nmi 0.6011 , ari 0.3973 , f1 0.5010
+epoch 37 loss: 0.6502
+37 :acc 0.5801 , nmi 0.5941 , ari 0.3903 , f1 0.4950
+epoch 38 loss: 0.6483
+38 :acc 0.5759 , nmi 0.6023 , ari 0.3881 , f1 0.4980
+epoch 39 loss: 0.6448
+39 :acc 0.5641 , nmi 0.5943 , ari 0.3800 , f1 0.4972
+epoch 40 loss: 0.6432
+40 :acc 0.5658 , nmi 0.5969 , ari 0.3824 , f1 0.4994
+epoch 41 loss: 0.6410
+41 :acc 0.5834 , nmi 0.6023 , ari 0.4079 , f1 0.5215
+epoch 42 loss: 0.6387
+42 :acc 0.5792 , nmi 0.6006 , ari 0.4025 , f1 0.5196
+epoch 43 loss: 0.6373
+43 :acc 0.5725 , nmi 0.5998 , ari 0.3843 , f1 0.5001
+epoch 44 loss: 0.6353
+44 :acc 0.5641 , nmi 0.6020 , ari 0.3782 , f1 0.4966
+epoch 45 loss: 0.6361
+45 :acc 0.5666 , nmi 0.5993 , ari 0.3812 , f1 0.4974
+epoch 46 loss: 0.6333
+46 :acc 0.5591 , nmi 0.6006 , ari 0.3836 , f1 0.4990
+epoch 47 loss: 0.6315
+47 :acc 0.5733 , nmi 0.6041 , ari 0.3986 , f1 0.5205
+epoch 48 loss: 0.6296
+48 :acc 0.6337 , nmi 0.6099 , ari 0.4297 , f1 0.5071
+epoch 49 loss: 0.6276
+49 :acc 0.5742 , nmi 0.6089 , ari 0.4053 , f1 0.4924
+epoch 50 loss: 0.6264
+50 :acc 0.5666 , nmi 0.6107 , ari 0.4302 , f1 0.4745
+epoch 51 loss: 0.6252
+51 :acc 0.5650 , nmi 0.5992 , ari 0.3859 , f1 0.5127
+epoch 52 loss: 0.6239
+52 :acc 0.5700 , nmi 0.5995 , ari 0.3867 , f1 0.5118
+epoch 53 loss: 0.6227
+53 :acc 0.5784 , nmi 0.5965 , ari 0.3928 , f1 0.5080
+epoch 54 loss: 0.6207
+54 :acc 0.5742 , nmi 0.5941 , ari 0.3880 , f1 0.5031
+epoch 55 loss: 0.6187
+55 :acc 0.5868 , nmi 0.5989 , ari 0.3890 , f1 0.5136
+epoch 56 loss: 0.6193
+56 :acc 0.5742 , nmi 0.5975 , ari 0.3864 , f1 0.5166
+epoch 57 loss: 0.6161
+57 :acc 0.5851 , nmi 0.6014 , ari 0.4033 , f1 0.5183
+epoch 58 loss: 0.6157
+58 :acc 0.6002 , nmi 0.6015 , ari 0.4034 , f1 0.5051
+epoch 59 loss: 0.6130
+59 :acc 0.5532 , nmi 0.5904 , ari 0.3784 , f1 0.5010
+epoch 60 loss: 0.6120
+60 :acc 0.5792 , nmi 0.5939 , ari 0.3835 , f1 0.5111
+epoch 61 loss: 0.6104
+61 :acc 0.5750 , nmi 0.5980 , ari 0.3979 , f1 0.5167
+epoch 62 loss: 0.6093
+62 :acc 0.5851 , nmi 0.6069 , ari 0.4216 , f1 0.4927
+epoch 63 loss: 0.6091
+63 :acc 0.5725 , nmi 0.5914 , ari 0.3837 , f1 0.4919
+epoch 64 loss: 0.6084
+64 :acc 0.5834 , nmi 0.5882 , ari 0.3816 , f1 0.5051
+epoch 65 loss: 0.6071
+65 :acc 0.5859 , nmi 0.5928 , ari 0.3852 , f1 0.5126
+epoch 66 loss: 0.6053
+66 :acc 0.5658 , nmi 0.5940 , ari 0.3852 , f1 0.5090
+epoch 67 loss: 0.6043
+67 :acc 0.5884 , nmi 0.6019 , ari 0.4219 , f1 0.4896
+epoch 68 loss: 0.6025
+68 :acc 0.5599 , nmi 0.5854 , ari 0.3703 , f1 0.5038
+epoch 69 loss: 0.6011
+69 :acc 0.5842 , nmi 0.5934 , ari 0.3943 , f1 0.5157
+epoch 70 loss: 0.5998
+70 :acc 0.5708 , nmi 0.5907 , ari 0.3895 , f1 0.5095
+epoch 71 loss: 0.6001
+71 :acc 0.5784 , nmi 0.6051 , ari 0.4218 , f1 0.4749
+epoch 72 loss: 0.5976
+72 :acc 0.5717 , nmi 0.6074 , ari 0.4226 , f1 0.4917
+epoch 73 loss: 0.5980
+73 :acc 0.6270 , nmi 0.6191 , ari 0.4819 , f1 0.4806
+epoch 74 loss: 0.5971
+74 :acc 0.5557 , nmi 0.5847 , ari 0.3689 , f1 0.4994
+epoch 75 loss: 0.5957
+75 :acc 0.5549 , nmi 0.5867 , ari 0.3765 , f1 0.5007
+epoch 76 loss: 0.5936
+76 :acc 0.6563 , nmi 0.6166 , ari 0.4634 , f1 0.5112
+epoch 77 loss: 0.5917
+77 :acc 0.6119 , nmi 0.6135 , ari 0.4256 , f1 0.5054
+epoch 78 loss: 0.5908
+78 :acc 0.5826 , nmi 0.5954 , ari 0.3894 , f1 0.5088
+epoch 79 loss: 0.5891
+79 :acc 0.5784 , nmi 0.5920 , ari 0.3802 , f1 0.5061
+epoch 80 loss: 0.5866
+80 :acc 0.5624 , nmi 0.5857 , ari 0.3695 , f1 0.5014
+epoch 81 loss: 0.5856
+81 :acc 0.5775 , nmi 0.6022 , ari 0.3967 , f1 0.4961
+epoch 82 loss: 0.5845
+82 :acc 0.5700 , nmi 0.5928 , ari 0.3938 , f1 0.4886
+epoch 83 loss: 0.5844
+83 :acc 0.5633 , nmi 0.5787 , ari 0.3688 , f1 0.4972
+epoch 84 loss: 0.5830
+84 :acc 0.5851 , nmi 0.5943 , ari 0.4096 , f1 0.4860
+epoch 85 loss: 0.5820
+85 :acc 0.6614 , nmi 0.6180 , ari 0.4525 , f1 0.5203
+epoch 86 loss: 0.5801
+86 :acc 0.5390 , nmi 0.5915 , ari 0.3386 , f1 0.4921
+epoch 87 loss: 0.5790
+87 :acc 0.5935 , nmi 0.6008 , ari 0.3970 , f1 0.5183
+epoch 88 loss: 0.5776
+88 :acc 0.5792 , nmi 0.5907 , ari 0.3821 , f1 0.5094
+epoch 89 loss: 0.5767
+89 :acc 0.5993 , nmi 0.6017 , ari 0.4137 , f1 0.4976
+epoch 90 loss: 0.5752
+90 :acc 0.6530 , nmi 0.6028 , ari 0.4453 , f1 0.5088
+epoch 91 loss: 0.5762
+91 :acc 0.5817 , nmi 0.5964 , ari 0.3830 , f1 0.5150
+epoch 92 loss: 0.5733
+92 :acc 0.5901 , nmi 0.5939 , ari 0.3874 , f1 0.5138
+epoch 93 loss: 0.5716
+93 :acc 0.5792 , nmi 0.6084 , ari 0.4227 , f1 0.4965
+epoch 94 loss: 0.5718
+94 :acc 0.5784 , nmi 0.5943 , ari 0.3977 , f1 0.4921
+epoch 95 loss: 0.5688
+95 :acc 0.5977 , nmi 0.5993 , ari 0.4091 , f1 0.4970
+epoch 96 loss: 0.5678
+96 :acc 0.5918 , nmi 0.6032 , ari 0.3953 , f1 0.5180
+epoch 97 loss: 0.5667
+97 :acc 0.5616 , nmi 0.5880 , ari 0.3762 , f1 0.5028
+epoch 98 loss: 0.5650
+98 :acc 0.5851 , nmi 0.6005 , ari 0.4078 , f1 0.4957
+epoch 99 loss: 0.5631
+99 :acc 0.5432 , nmi 0.5888 , ari 0.3432 , f1 0.4908
+epoch 100 loss: 0.5623
+100 :acc 0.6161 , nmi 0.5934 , ari 0.3917 , f1 0.5048
+epoch 101 loss: 0.5610
+101 :acc 0.5968 , nmi 0.6055 , ari 0.4124 , f1 0.5007
+epoch 102 loss: 0.5606
+102 :acc 0.5692 , nmi 0.5854 , ari 0.3774 , f1 0.5037
+epoch 103 loss: 0.5581
+103 :acc 0.6018 , nmi 0.6160 , ari 0.4214 , f1 0.5060
+epoch 104 loss: 0.5568
+104 :acc 0.5390 , nmi 0.5798 , ari 0.3328 , f1 0.4848
+epoch 105 loss: 0.5558
+105 :acc 0.5943 , nmi 0.5977 , ari 0.3928 , f1 0.5215
+epoch 106 loss: 0.5531
+106 :acc 0.5407 , nmi 0.5795 , ari 0.3346 , f1 0.4830
+epoch 107 loss: 0.5514
+107 :acc 0.6387 , nmi 0.6122 , ari 0.4403 , f1 0.5120
+epoch 108 loss: 0.5511
+108 :acc 0.5725 , nmi 0.6047 , ari 0.4184 , f1 0.4894
+epoch 109 loss: 0.5498
+109 :acc 0.5490 , nmi 0.5924 , ari 0.3803 , f1 0.5005
+epoch 110 loss: 0.5477
+110 :acc 0.6010 , nmi 0.5999 , ari 0.4221 , f1 0.4928
+epoch 111 loss: 0.5465
+111 :acc 0.6421 , nmi 0.6002 , ari 0.4345 , f1 0.5060
+epoch 112 loss: 0.5467
+112 :acc 0.6547 , nmi 0.6051 , ari 0.4550 , f1 0.5158
+epoch 113 loss: 0.5448
+113 :acc 0.6010 , nmi 0.6148 , ari 0.4435 , f1 0.5020
+epoch 114 loss: 0.5434
+114 :acc 0.4996 , nmi 0.5807 , ari 0.3331 , f1 0.4580
+epoch 115 loss: 0.5415
+115 :acc 0.5700 , nmi 0.5980 , ari 0.4171 , f1 0.4890
+epoch 116 loss: 0.5415
+116 :acc 0.6547 , nmi 0.6028 , ari 0.4512 , f1 0.5161
+epoch 117 loss: 0.5380
+117 :acc 0.5650 , nmi 0.5814 , ari 0.3680 , f1 0.5080
+epoch 118 loss: 0.5383
+118 :acc 0.5775 , nmi 0.5909 , ari 0.4125 , f1 0.4845
+epoch 119 loss: 0.5365
+119 :acc 0.5775 , nmi 0.5930 , ari 0.4137 , f1 0.4776
+epoch 120 loss: 0.5356
+120 :acc 0.5733 , nmi 0.6006 , ari 0.4247 , f1 0.4785
+epoch 121 loss: 0.5340
+121 :acc 0.5532 , nmi 0.5617 , ari 0.3398 , f1 0.5208
+epoch 122 loss: 0.5310
+122 :acc 0.5331 , nmi 0.5532 , ari 0.3226 , f1 0.5053
+epoch 123 loss: 0.5310
+123 :acc 0.5675 , nmi 0.5928 , ari 0.4120 , f1 0.4677
+epoch 124 loss: 0.5280
+124 :acc 0.5641 , nmi 0.5915 , ari 0.4193 , f1 0.4844
+epoch 125 loss: 0.5268
+125 :acc 0.5180 , nmi 0.5597 , ari 0.3085 , f1 0.4921
+epoch 126 loss: 0.5250
+126 :acc 0.5122 , nmi 0.5622 , ari 0.3101 , f1 0.4926
+epoch 127 loss: 0.5235
+127 :acc 0.5717 , nmi 0.5837 , ari 0.4066 , f1 0.4650
+epoch 128 loss: 0.5224
+128 :acc 0.5624 , nmi 0.5809 , ari 0.4079 , f1 0.4593
+epoch 129 loss: 0.5202
+129 :acc 0.5775 , nmi 0.5938 , ari 0.4191 , f1 0.4733
+epoch 130 loss: 0.5187
+130 :acc 0.5826 , nmi 0.6011 , ari 0.4297 , f1 0.4788
+epoch 131 loss: 0.5168
+131 :acc 0.5775 , nmi 0.6003 , ari 0.4301 , f1 0.4655
+epoch 132 loss: 0.5144
+132 :acc 0.5172 , nmi 0.5613 , ari 0.3055 , f1 0.4922
+epoch 133 loss: 0.5132
+133 :acc 0.5591 , nmi 0.5529 , ari 0.3513 , f1 0.5249
+epoch 134 loss: 0.5122
+134 :acc 0.5675 , nmi 0.5951 , ari 0.4183 , f1 0.4723
+epoch 135 loss: 0.5104
+135 :acc 0.5733 , nmi 0.5945 , ari 0.4211 , f1 0.4676
+epoch 136 loss: 0.5086
+136 :acc 0.5868 , nmi 0.5675 , ari 0.3681 , f1 0.5203
+epoch 137 loss: 0.5069
+137 :acc 0.5599 , nmi 0.5793 , ari 0.4047 , f1 0.4575
+epoch 138 loss: 0.5065
+138 :acc 0.5616 , nmi 0.5901 , ari 0.4080 , f1 0.4660
+epoch 139 loss: 0.5051
+139 :acc 0.5792 , nmi 0.6018 , ari 0.4253 , f1 0.4924
+epoch 140 loss: 0.5041
+140 :acc 0.5767 , nmi 0.5898 , ari 0.4132 , f1 0.4840
+epoch 141 loss: 0.5014
+141 :acc 0.5692 , nmi 0.5821 , ari 0.4063 , f1 0.4737
+epoch 142 loss: 0.4992
+142 :acc 0.5155 , nmi 0.5408 , ari 0.3106 , f1 0.4825
+epoch 143 loss: 0.4983
+143 :acc 0.6111 , nmi 0.5923 , ari 0.4284 , f1 0.4957
+epoch 144 loss: 0.4977
+144 :acc 0.5893 , nmi 0.5631 , ari 0.3628 , f1 0.5241
+epoch 145 loss: 0.4946
+145 :acc 0.5650 , nmi 0.5800 , ari 0.4073 , f1 0.4697
+epoch 146 loss: 0.4933
+146 :acc 0.5658 , nmi 0.5746 , ari 0.4029 , f1 0.4668
+epoch 147 loss: 0.4922
+147 :acc 0.5080 , nmi 0.5472 , ari 0.3041 , f1 0.4867
+epoch 148 loss: 0.4900
+148 :acc 0.5926 , nmi 0.5729 , ari 0.3681 , f1 0.5362
+epoch 149 loss: 0.4891
+149 :acc 0.5851 , nmi 0.5781 , ari 0.3615 , f1 0.5290
+epoch 150 loss: 0.4880
+150 :acc 0.5759 , nmi 0.5900 , ari 0.4071 , f1 0.4873
+epoch 151 loss: 0.4859
+151 :acc 0.5641 , nmi 0.5749 , ari 0.3978 , f1 0.4579
+epoch 152 loss: 0.4846
+152 :acc 0.5591 , nmi 0.5808 , ari 0.4125 , f1 0.4772
+epoch 153 loss: 0.4833
+153 :acc 0.5809 , nmi 0.5965 , ari 0.4130 , f1 0.4909
+epoch 154 loss: 0.4819
+154 :acc 0.6337 , nmi 0.6051 , ari 0.4408 , f1 0.5052
+epoch 155 loss: 0.4800
+155 :acc 0.5733 , nmi 0.5859 , ari 0.4084 , f1 0.4693
+epoch 156 loss: 0.4792
+156 :acc 0.5717 , nmi 0.5692 , ari 0.4002 , f1 0.4646
+epoch 157 loss: 0.4773
+157 :acc 0.5733 , nmi 0.5949 , ari 0.4143 , f1 0.4921
+epoch 158 loss: 0.4756
+158 :acc 0.5641 , nmi 0.5614 , ari 0.3501 , f1 0.5251
+epoch 159 loss: 0.4745
+159 :acc 0.5214 , nmi 0.5103 , ari 0.2935 , f1 0.4856
+epoch 160 loss: 0.4747
+160 :acc 0.5683 , nmi 0.5844 , ari 0.4061 , f1 0.4745
+epoch 161 loss: 0.4723
+161 :acc 0.5163 , nmi 0.5542 , ari 0.3052 , f1 0.4928
+epoch 162 loss: 0.4713
+162 :acc 0.5222 , nmi 0.5515 , ari 0.3119 , f1 0.4837
+epoch 163 loss: 0.4706
+163 :acc 0.5817 , nmi 0.5929 , ari 0.4154 , f1 0.4736
+epoch 164 loss: 0.4686
+164 :acc 0.5180 , nmi 0.5436 , ari 0.3027 , f1 0.4803
+epoch 165 loss: 0.4676
+165 :acc 0.5289 , nmi 0.5520 , ari 0.3096 , f1 0.4933
+epoch 166 loss: 0.4643
+166 :acc 0.5423 , nmi 0.5650 , ari 0.3143 , f1 0.5038
+epoch 167 loss: 0.4635
+167 :acc 0.5884 , nmi 0.5662 , ari 0.3646 , f1 0.5273
+epoch 168 loss: 0.4606
+168 :acc 0.5792 , nmi 0.5554 , ari 0.3548 , f1 0.5187
+epoch 169 loss: 0.4604
+169 :acc 0.5197 , nmi 0.5532 , ari 0.3086 , f1 0.4898
+epoch 170 loss: 0.4585
+170 :acc 0.5122 , nmi 0.5520 , ari 0.3036 , f1 0.4826
+epoch 171 loss: 0.4576
+171 :acc 0.5147 , nmi 0.5426 , ari 0.3105 , f1 0.4805
+epoch 172 loss: 0.4551
+172 :acc 0.5172 , nmi 0.5429 , ari 0.3159 , f1 0.4833
+epoch 173 loss: 0.4537
+173 :acc 0.5264 , nmi 0.5550 , ari 0.3169 , f1 0.4893
+epoch 174 loss: 0.4527
+174 :acc 0.5574 , nmi 0.5594 , ari 0.3479 , f1 0.5179
+epoch 175 loss: 0.4511
+175 :acc 0.5524 , nmi 0.5387 , ari 0.3361 , f1 0.5093
+epoch 176 loss: 0.4507
+176 :acc 0.5666 , nmi 0.5628 , ari 0.3974 , f1 0.4684
+epoch 177 loss: 0.4499
+177 :acc 0.5599 , nmi 0.5402 , ari 0.3493 , f1 0.5077
+epoch 178 loss: 0.4479
+178 :acc 0.5868 , nmi 0.5635 , ari 0.3587 , f1 0.5249
+epoch 179 loss: 0.4471
+179 :acc 0.5633 , nmi 0.5586 , ari 0.3516 , f1 0.5190
+epoch 180 loss: 0.4463
+180 :acc 0.5650 , nmi 0.5807 , ari 0.4056 , f1 0.4587
+epoch 181 loss: 0.4436
+181 :acc 0.5264 , nmi 0.5528 , ari 0.3102 , f1 0.4883
+epoch 182 loss: 0.4438
+182 :acc 0.5373 , nmi 0.5561 , ari 0.3123 , f1 0.4981
+epoch 183 loss: 0.4413
+183 :acc 0.5725 , nmi 0.5818 , ari 0.4072 , f1 0.4695
+epoch 184 loss: 0.4401
+184 :acc 0.5733 , nmi 0.5730 , ari 0.4003 , f1 0.4795
+epoch 185 loss: 0.4387
+185 :acc 0.5289 , nmi 0.5527 , ari 0.3032 , f1 0.4905
+epoch 186 loss: 0.4382
+186 :acc 0.5088 , nmi 0.5519 , ari 0.3015 , f1 0.4843
+epoch 187 loss: 0.4374
+187 :acc 0.5029 , nmi 0.5461 , ari 0.2982 , f1 0.4765
+epoch 188 loss: 0.4347
+188 :acc 0.5339 , nmi 0.5491 , ari 0.3070 , f1 0.4950
+epoch 189 loss: 0.4355
+189 :acc 0.5633 , nmi 0.5731 , ari 0.3856 , f1 0.4652
+epoch 190 loss: 0.4332
+190 :acc 0.5650 , nmi 0.5690 , ari 0.3961 , f1 0.4628
+epoch 191 loss: 0.4327
+191 :acc 0.5633 , nmi 0.5503 , ari 0.3496 , f1 0.5225
+epoch 192 loss: 0.4308
+192 :acc 0.6479 , nmi 0.5896 , ari 0.4479 , f1 0.4956
+epoch 193 loss: 0.4289
+193 :acc 0.5692 , nmi 0.5670 , ari 0.3889 , f1 0.4822
+epoch 194 loss: 0.4283
+194 :acc 0.5532 , nmi 0.5786 , ari 0.3961 , f1 0.4648
+epoch 195 loss: 0.4261
+195 :acc 0.5356 , nmi 0.5539 , ari 0.3293 , f1 0.4938
+epoch 196 loss: 0.4267
+196 :acc 0.5054 , nmi 0.5398 , ari 0.2944 , f1 0.4787
+epoch 197 loss: 0.4236
+197 :acc 0.4962 , nmi 0.5457 , ari 0.2914 , f1 0.4730
+epoch 198 loss: 0.4239
+198 :acc 0.5256 , nmi 0.5557 , ari 0.3197 , f1 0.4853
+epoch 199 loss: 0.4218
+199 :acc 0.5247 , nmi 0.5481 , ari 0.3186 , f1 0.4844
+✅ 模型已保存至: model/mtab.pkl
+
+✅ model/mtab.pkl (30472822 bytes)
+⏱️  自编码器预训练 完成 (44.6秒)
+✅ 步骤 4 完成: 自编码器预训练
+
+🎯 步骤 5/5: scDSC主训练
+
+============================================================
+🕐 [01:38:16] 开始 scDSC主训练
+============================================================
+📤 输出:
+🚀 scDSC 训练启动
+📊 配置: 8聚类, 5000基因, 200轮训练
+✅ 所有必要文件已就绪
+📖 加载数据...
+   数据维度: (1193, 5000)
+   标签数量: 8
+   原始数据: (1193, 5000)
+   Size factors范围: [-88.022, 44.112]
+✅ 数据一致性检查通过
+
+============================================================
+🎯 开始 scDSC 训练
+============================================================
+🖥️  使用设备: cuda
+🧬 ZINB模块: 启用
+✅ 加载预训练模型: model/mtab.pkl
+📋 模型参数总数: 18,911,368
+📊 图尺寸: torch.Size([1193, 1193])
+📊 数据尺寸: torch.Size([1193, 5000])
+🏷️  标签数量: 8
+🎯 初始化聚类中心...
+📈 初始聚类结果:
+0 :acc 0.5289 , nmi 0.5431 , ari 0.3236 , f1 0.4906
+📊 损失权重: α=0.1, β=0.01, γ=1.0, δ=0.1
+
+🚀 开始训练 (最多200轮)...
+
+📍 Epoch 0: 更新目标分布
+   Q分布: ARI=0.3236, NMI=0.5431
+   Z分布: ARI=0.2279, NMI=0.3273
+   🎯 新最佳: ARI=0.2279
+Epoch   0: total=nan, kl=0.1461, ce=1.3003, re=0.4218, zinb=nan (0.5s)
+
+📍 Epoch 10: 更新目标分布
+   Q分布: ARI=0.0000, NMI=0.0000
+   Z分布: ARI=0.0000, NMI=0.0000
+Epoch  10: total=nan, kl=nan, ce=nan, re=nan, zinb=nan (0.1s)
+
+📍 Epoch 20: 更新目标分布
+   Q分布: ARI=0.0000, NMI=0.0000
+   Z分布: ARI=0.0000, NMI=0.0000
+Epoch  20: total=nan, kl=nan, ce=nan, re=nan, zinb=nan (0.0s)
+
+📍 Epoch 30: 更新目标分布
+   Q分布: ARI=0.0000, NMI=0.0000
+   Z分布: ARI=0.0000, NMI=0.0000
+🛑 早停 (patience=3)!
+
+⏱️  训练完成，总耗时: 1.8秒
+
+🎯 计算最终结果...
+
+📊 最终结果总结:
+==================================================
+Q分布 (聚类层): ARI=0.0000, NMI=0.0000
+Z分布 (GNN层):  ARI=0.0000, NMI=0.0000
+训练最佳:       ARI=0.2279 (epoch 0)
+设备:          cuda
+ZINB:          启用
+==================================================
+
+📈 与论文结果对比 (使用Z分布):
+ARI: 0.0000 / 0.62 = 0.0%
+NMI: 0.0000 / 0.68 = 0.0%
+
+⏱️  scDSC主训练 完成 (16.3秒)
+✅ 步骤 5 完成: scDSC主训练
+
+⏱️  总耗时: 89.9秒 (1.5分钟)
+
+============================================================
+🕐 [01:38:32] 🎯 实验总结
+============================================================
+📋 生成文件检查:
+✅ 预处理数据: data/mtab_processed.txt (153009821 bytes)
+✅ 预处理标签: data/mtab_processed_label.txt (2386 bytes)
+✅ KNN图: graph/mtab_processed_graph.txt (96596 bytes)
+✅ H5数据文件: data/mtab.h5 (47731592 bytes)
+✅ 预训练模型: model/mtab.pkl (30472822 bytes)
+
+🎉 所有步骤成功完成!
+💡 主要文件已生成，可以进行后续分析
+
+🎊 scDSC 复现流水线全部完成!
+✅ 完成: Sun Jul 13 01:38:33 AM CDT 2025

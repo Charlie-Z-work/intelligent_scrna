@@ -1,0 +1,36 @@
+🚀 直接运行主训练: Sun Jul 13 12:52:58 AM CDT 2025
+Sun Jul 13 00:52:58 2025       
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 525.147.05   Driver Version: 525.147.05   CUDA Version: 12.0     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  Tesla V100-SXM2...  On   | 00000000:15:00.0 Off |                    0 |
+| N/A   26C    P0    42W / 300W |      0MiB / 32768MiB |      0%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+                                                                               
++-----------------------------------------------------------------------------+
+| Processes:                                                                  |
+|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+|        ID   ID                                                   Usage      |
+|=============================================================================|
+|  No running processes found                                                 |
++-----------------------------------------------------------------------------+
+📦 安装必要包...
+Requirement already satisfied: h5py in /users/tzheng/.local/lib/python3.11/site-packages (3.14.0)
+Requirement already satisfied: munkres in /users/tzheng/.local/lib/python3.11/site-packages (1.1.4)
+Requirement already satisfied: numpy>=1.19.3 in /hpc/m3/python/3.11.11/pytorch-2025.04.01/lib/python3.11/site-packages (from h5py) (1.26.4)
+
+[notice] A new release of pip is available: 24.0 -> 25.1.1
+[notice] To update, run: pip install --upgrade pip
+🔧 直接运行主训练...
+Traceback (most recent call last):
+  File "/users/tzheng/scDSC/scDSC_7_13_2025/MTAB/dsc_mtab.py", line 21, in <module>
+    from GNN import GNNLayer
+  File "/users/tzheng/scDSC/scDSC_7_13_2025/GNN.py", line 6, in <module>
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+✅ 完成: Sun Jul 13 12:53:06 AM CDT 2025

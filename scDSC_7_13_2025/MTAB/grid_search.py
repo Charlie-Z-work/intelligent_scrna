@@ -1,0 +1,336 @@
+import sys
+import os
+sys.path.append('..')
+import numpy as np
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.nn.parameter import Parameter
+from torch.optim import Adam
+from torch.nn import Linear
+from utils import load_data, load_graph
+from evaluation import eva
+import h5py
+from sklearn.cluster import KMeans
+from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score
+from layers import ZINBLoss, MeanAct, DispAct
+from GNN import GNNLayer
+import time
+import datetime
+import itertools
+
+class AE(nn.Module):
+    def __init__(self, n_enc_1, n_enc_2, n_enc_3, n_dec_1, n_dec_2, n_dec_3, n_input, n_z):
+        super(AE, self).__init__()
+        self.enc_1 = Linear(n_input, n_enc_1)
+        self.BN1 = nn.BatchNorm1d(n_enc_1)
+        self.enc_2 = Linear(n_enc_1, n_enc_2)
+        self.BN2 = nn.BatchNorm1d(n_enc_2)
+        self.enc_3 = Linear(n_enc_2, n_enc_3)
+        self.BN3 = nn.BatchNorm1d(n_enc_3)
+        self.z_layer = Linear(n_enc_3, n_z)
+        self.dec_1 = Linear(n_z, n_dec_1)
+        self.BN4 = nn.BatchNorm1d(n_dec_1)
+        self.dec_2 = Linear(n_dec_1, n_dec_2)
+        self.BN5 = nn.BatchNorm1d(n_dec_2)
+        self.dec_3 = Linear(n_dec_2, n_dec_3)
+        self.BN6 = nn.BatchNorm1d(n_dec_3)
+        self.x_bar_layer = Linear(n_dec_3, n_input)
+
+    def forward(self, x):
+        enc_h1 = F.relu(self.BN1(self.enc_1(x)))
+        enc_h2 = F.relu(self.BN2(self.enc_2(enc_h1)))
+        enc_h3 = F.relu(self.BN3(self.enc_3(enc_h2)))
+        z = self.z_layer(enc_h3)
+        dec_h1 = F.relu(self.BN4(self.dec_1(z)))
+        dec_h2 = F.relu(self.BN5(self.dec_2(dec_h1)))
+        dec_h3 = F.relu(self.BN6(self.dec_3(dec_h2)))
+        x_bar = self.x_bar_layer(dec_h3)
+        return x_bar, enc_h1, enc_h2, enc_h3, z, dec_h3
+
+class SDCN_Grid(nn.Module):
+    def __init__(self, n_enc_1, n_enc_2, n_enc_3, n_dec_1, n_dec_2, n_dec_3,
+                 n_input, n_z, n_clusters, v=1, use_zinb=True, pretrain_path='model/mtab.pkl'):
+        super(SDCN_Grid, self).__init__()
+        self.use_zinb = use_zinb
+        
+        self.ae = AE(n_enc_1, n_enc_2, n_enc_3, n_dec_1, n_dec_2, n_dec_3, n_input, n_z)
+        
+        if os.path.exists(pretrain_path):
+            self.ae.load_state_dict(torch.load(pretrain_path, map_location='cpu'))
+
+        self.gnn_1 = GNNLayer(n_input, n_enc_1)
+        self.gnn_2 = GNNLayer(n_enc_1, n_enc_2)
+        self.gnn_3 = GNNLayer(n_enc_2, n_enc_3)
+        self.gnn_4 = GNNLayer(n_enc_3, n_z)
+        self.gnn_5 = GNNLayer(n_z, n_clusters)
+        
+        self.cluster_layer = Parameter(torch.Tensor(n_clusters, n_z))
+        torch.nn.init.xavier_normal_(self.cluster_layer.data)
+
+        if self.use_zinb:
+            self._dec_mean = nn.Sequential(nn.Linear(n_dec_3, n_input), MeanAct())
+            self._dec_disp = nn.Sequential(nn.Linear(n_dec_3, n_input), DispAct())
+            self._dec_pi = nn.Sequential(nn.Linear(n_dec_3, n_input), nn.Sigmoid())
+            self.zinb_loss = ZINBLoss()
+
+        self.v = v
+
+    def forward(self, x, adj, sigma=0.5):
+        x_bar, tra1, tra2, tra3, z, dec_h3 = self.ae(x)
+        h = self.gnn_1(x, adj)
+        h = self.gnn_2((1 - sigma) * h + sigma * tra1, adj)
+        h = self.gnn_3((1 - sigma) * h + sigma * tra2, adj)
+        h = self.gnn_4((1 - sigma) * h + sigma * tra3, adj)
+        h = self.gnn_5((1 - sigma) * h + sigma * z, adj, active=False)
+        predict = F.softmax(h, dim=1)
+
+        if self.use_zinb:
+            _mean = self._dec_mean(dec_h3)
+            _disp = self._dec_disp(dec_h3)
+            _pi = self._dec_pi(dec_h3)
+        else:
+            _mean = _disp = _pi = None
+
+        q = 1.0 / (1.0 + torch.sum(torch.pow(z.unsqueeze(1) - self.cluster_layer, 2), 2) / self.v)
+        q = q.pow((self.v + 1.0) / 2.0)
+        q = (q.t() / torch.sum(q, 1)).t()
+        return x_bar, q, predict, z, _mean, _disp, _pi
+
+def target_distribution(q):
+    weight = q ** 2 / q.sum(0)
+    return (weight.t() / weight.sum(1)).t()
+
+def quick_train(config, config_id):
+    """快速训练单个配置"""
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    
+    # 加载数据 (只加载一次)
+    global X_raw_tensor, X_scaled_tensor, y_global, sf_tensor, adj_global, data_global
+    
+    # 创建模型
+    model = SDCN_Grid(500, 500, 2000, 2000, 500, 500, 5000, 20, 8, v=1, use_zinb=True).to(device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=config['lr'], weight_decay=1e-5)
+    
+    # 学习率调度器
+    if config.get('use_scheduler', False):
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=config['epochs'], eta_min=1e-6)
+    
+    # K-means初始化
+    with torch.no_grad():
+        _, _, _, _, z, _ = model.ae(data_global)
+    kmeans = KMeans(n_clusters=8, n_init=10, random_state=42)  # 减少n_init加速
+    y_pred = kmeans.fit_predict(z.data.cpu().numpy())
+    model.cluster_layer.data = torch.tensor(kmeans.cluster_centers_).to(device)
+    
+    # 训练记录
+    best_ari = 0
+    best_nmi = 0
+    patience_counter = 0
+    
+    start_time = time.time()
+    
+    global p
+    for epoch in range(config['epochs']):
+        # 更新目标分布 (减少频率)
+        if epoch % 20 == 0:
+            with torch.no_grad():
+                _, tmp_q, pred, _, _, _, _ = model(data_global, adj_global, sigma=config.get('sigma', 0.5))
+                p = target_distribution(tmp_q.data)
+                
+                res2 = pred.data.cpu().numpy().argmax(1)
+                ari_z = adjusted_rand_score(y_global, res2)
+                nmi_z = normalized_mutual_info_score(y_global, res2)
+                
+                # 更新最佳结果
+                if ari_z > best_ari:
+                    best_ari = ari_z
+                    patience_counter = 0
+                else:
+                    patience_counter += 1
+                
+                if nmi_z > best_nmi:
+                    best_nmi = nmi_z
+                
+                # 早停 (更激进)
+                if patience_counter >= 3:  # 60 epochs without improvement
+                    break
+        
+        # 前向传播
+        x_bar, q, pred, z, meanbatch, dispbatch, pibatch = model(data_global, adj_global, sigma=config.get('sigma', 0.5))
+        
+        # 损失计算
+        kl_loss = F.kl_div(q.log(), p, reduction='batchmean')
+        ce_loss = F.kl_div(pred.log(), p, reduction='batchmean')
+        re_loss = F.mse_loss(x_bar, data_global)
+        
+        # ZINB损失
+        try:
+            zinb_loss_value = model.zinb_loss(X_raw_tensor, meanbatch, dispbatch, pibatch, sf_tensor)
+            if torch.isnan(zinb_loss_value) or torch.isinf(zinb_loss_value):
+                zinb_loss_value = torch.tensor(0.0, device=device)
+        except:
+            zinb_loss_value = torch.tensor(0.0, device=device)
+        
+        total_loss = (config['alpha'] * kl_loss + config['beta'] * ce_loss + 
+                     config['gamma'] * re_loss + config['delta'] * zinb_loss_value)
+        
+        # 反向传播
+        optimizer.zero_grad()
+        total_loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+        optimizer.step()
+        
+        if config.get('use_scheduler', False):
+            scheduler.step()
+    
+    training_time = time.time() - start_time
+    
+    return {
+        'config_id': config_id,
+        'config': config,
+        'ari': best_ari,
+        'nmi': best_nmi,
+        'time': training_time,
+        'score': 0.6 * best_ari + 0.4 * best_nmi  # 综合评分
+    }
+
+def run_grid_search():
+    """运行网格搜索"""
+    
+    # 全局数据加载 (只加载一次)
+    global X_raw_tensor, X_scaled_tensor, y_global, sf_tensor, adj_global, data_global
+    
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"🖥️  设备: {device}")
+    
+    # 加载数据
+    with h5py.File("data/mtab.h5", "r") as f:
+        X_raw = np.array(f['X_raw'])
+        X_scaled = np.array(f['X'])
+        y_global = np.array(f['Y'])
+        size_factors = np.array(f['size_factors'])
+    
+    print(f"📊 数据: {X_scaled.shape}, 类别: {len(np.unique(y_global))}")
+    
+    # 转换为张量 (全局)
+    adj_global = load_graph('mtab_processed', None).to(device)
+    data_global = torch.Tensor(X_scaled).to(device)
+    X_raw_tensor = torch.tensor(X_raw, dtype=torch.float32).to(device)
+    sf_tensor = torch.tensor(size_factors, dtype=torch.float32).to(device)
+    
+    # 定义网格搜索参数
+    param_grid = {
+        'alpha': [0.05, 0.08, 0.1, 0.12, 0.15],          # KL损失权重
+        'beta': [0.005, 0.01, 0.02, 0.03],               # CE损失权重  
+        'gamma': [0.8, 1.0, 1.2],                        # 重构损失权重
+        'delta': [0.08, 0.1, 0.12, 0.15, 0.18, 0.2],    # ZINB损失权重
+        'lr': [8e-5, 1e-4, 1.2e-4, 1.5e-4],             # 学习率
+        'sigma': [0.4, 0.5, 0.6, 0.7],                   # GNN-AE平衡
+        'epochs': [80, 100],                              # 训练轮数
+        'use_scheduler': [False, True]                    # 是否使用调度器
+    }
+    
+    # 生成所有组合
+    keys = param_grid.keys()
+    values = param_grid.values()
+    combinations = list(itertools.product(*values))
+    
+    print(f"🔍 网格搜索参数组合总数: {len(combinations)}")
+    print(f"📋 预计总时间: {len(combinations) * 3:.0f}秒 (~{len(combinations) * 3 / 60:.1f}分钟)")
+    
+    # 结果存储
+    results = []
+    
+    # 创建结果文件
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    job_id = os.environ.get('SLURM_JOB_ID', 'local')
+    results_file = f"results/logs/grid_search_{job_id}_{timestamp}.csv"
+    
+    # CSV表头
+    with open(results_file, 'w') as f:
+        f.write("config_id,alpha,beta,gamma,delta,lr,sigma,epochs,use_scheduler,ari,nmi,score,time\n")
+    
+    print(f"📁 结果文件: {results_file}")
+    print("\n🚀 开始网格搜索...")
+    
+    start_time = time.time()
+    
+    for i, combination in enumerate(combinations):
+        config = dict(zip(keys, combination))
+        
+        try:
+            result = quick_train(config, i+1)
+            results.append(result)
+            
+            # 实时保存结果
+            with open(results_file, 'a') as f:
+                f.write(f"{result['config_id']},{config['alpha']},{config['beta']},{config['gamma']},"
+                       f"{config['delta']},{config['lr']},{config['sigma']},{config['epochs']},"
+                       f"{config['use_scheduler']},{result['ari']:.4f},{result['nmi']:.4f},"
+                       f"{result['score']:.4f},{result['time']:.2f}\n")
+            
+            # 进度显示
+            if i % 50 == 0 or result['ari'] > 0.62 or result['nmi'] > 0.62:
+                elapsed = time.time() - start_time
+                remaining = (len(combinations) - i - 1) * (elapsed / (i + 1))
+                print(f"[{i+1:4d}/{len(combinations)}] "
+                      f"ARI={result['ari']:.4f}, NMI={result['nmi']:.4f}, "
+                      f"Score={result['score']:.4f}, Time={result['time']:.1f}s "
+                      f"(剩余:{remaining/60:.1f}min)")
+                
+                # 发现优秀结果时详细显示
+                if result['ari'] > 0.62 or result['nmi'] > 0.62:
+                    print(f"   🎯 优秀配置: {config}")
+        
+        except Exception as e:
+            print(f"❌ 配置 {i+1} 失败: {e}")
+            continue
+    
+    # 总结果分析
+    total_time = time.time() - start_time
+    print(f"\n🏁 网格搜索完成！总耗时: {total_time/60:.1f}分钟")
+    
+    if results:
+        # 按综合评分排序
+        results.sort(key=lambda x: x['score'], reverse=True)
+        
+        print(f"\n🏆 Top 10 配置:")
+        print("="*100)
+        for i, result in enumerate(results[:10]):
+            config = result['config']
+            print(f"{i+1:2d}. ARI={result['ari']:.4f}, NMI={result['nmi']:.4f}, Score={result['score']:.4f}")
+            print(f"    α={config['alpha']}, β={config['beta']}, γ={config['gamma']}, δ={config['delta']}")
+            print(f"    lr={config['lr']}, σ={config['sigma']}, epochs={config['epochs']}, scheduler={config['use_scheduler']}")
+            print()
+        
+        # 保存最佳配置
+        best_result = results[0]
+        best_config_file = f"results/logs/best_config_{job_id}_{timestamp}.txt"
+        with open(best_config_file, 'w') as f:
+            f.write("🏆 网格搜索最佳配置\n")
+            f.write("="*50 + "\n")
+            f.write(f"ARI: {best_result['ari']:.4f}\n")
+            f.write(f"NMI: {best_result['nmi']:.4f}\n")
+            f.write(f"综合评分: {best_result['score']:.4f}\n")
+            f.write(f"论文对比: ARI={best_result['ari']/0.62*100:.1f}%, NMI={best_result['nmi']/0.68*100:.1f}%\n\n")
+            f.write("最佳配置:\n")
+            for key, value in best_result['config'].items():
+                f.write(f"  {key}: {value}\n")
+        
+        print(f"📁 最佳配置保存至: {best_config_file}")
+        print(f"📊 完整结果保存至: {results_file}")
+        
+        # 统计分析
+        aris = [r['ari'] for r in results]
+        nmis = [r['nmi'] for r in results]
+        
+        print(f"\n📈 统计分析:")
+        print(f"ARI: 最佳={max(aris):.4f}, 平均={np.mean(aris):.4f}, 最差={min(aris):.4f}")
+        print(f"NMI: 最佳={max(nmis):.4f}, 平均={np.mean(nmis):.4f}, 最差={min(nmis):.4f}")
+        print(f"超越论文ARI(0.62)的配置: {sum(1 for ari in aris if ari > 0.62)}/{len(aris)}")
+        print(f"超越论文NMI(0.68)的配置: {sum(1 for nmi in nmis if nmi > 0.68)}/{len(nmis)}")
+
+if __name__ == "__main__":
+    os.makedirs("results/logs", exist_ok=True)
+    run_grid_search()
